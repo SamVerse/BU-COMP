@@ -1,30 +1,62 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Dashboard from '../pages/participant/Dashboard';
-import SubmissionsPage from '../pages/participant/Submissions';
-import ProjectsPage from '../pages/participant/Projects';
-import EventsPage from '../pages/participant/Events';
-import SettingsPage from '../pages/participant/Settings';
-import SubmissionFormPage from '../pages/participant/SubmissionFormPage';
+// src/routes/index.jsx
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 
-const AppRoutes = ({ onNewSubmission }) => {
+import LandingPage from "../home/LandingPage";
+import DashboardLayout from "../components/layout/DashboardLayout";
+
+// Auth Pages
+import Login from "../pages/auth/Login";
+import Signup from "../pages/auth/Signup";
+
+// Participant Pages
+import Dashboard from "../pages/participant/Dashboard";
+import SubmissionsPage from "../pages/participant/Submissions";
+import SubmissionFormPage from "../pages/participant/SubmissionFormPage";
+
+// Submission Flow Layout + Stages
+import SubmissionFlowLayout from "../pages/participant/submissionFlow/SubmissionFlowLayout";
+import SubmitStep from "../pages/participant/submissionFlow/SubmitStep";
+import EditStep from "../pages/participant/submissionFlow/EditStep";
+import PendingStep from "../pages/participant/submissionFlow/PendingStep";
+import EvaluatedStep from "../pages/participant/submissionFlow/EvaluatedStep";
+import EvaluatedDetails from "../pages/participant/submissionFlow/EvaluatedDetails";
+
+import EventsPage from "../pages/participant/Events";
+import SettingsPage from "../pages/participant/Settings";
+
+export default function AppRoutes() {
   return (
     <Routes>
-      {/* Default redirect */}
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      
-      {/* Main routes */}
-      <Route path="/dashboard" element={<Dashboard onNewSubmission={onNewSubmission} />} />
-      <Route path="/submissions" element={<SubmissionsPage onNewSubmission={onNewSubmission} />} />
-      <Route path="/submissions/new" element={<SubmissionFormPage />} />
-      <Route path="/projects" element={<ProjectsPage />} />
-      <Route path="/events" element={<EventsPage />} />
-      <Route path="/settings" element={<SettingsPage />} />
-      
-      {/* 404 Page */}
+
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+
+      {/* Dashboard layout pages */}
+      <Route element={<DashboardLayout />}>
+
+        <Route path="/dashboard" element={<Dashboard />} />
+
+        <Route path="/submissions" element={<SubmissionsPage />} />
+        <Route path="/submissions/new" element={<SubmissionFormPage />} />
+
+        <Route path="/submissions/:submissionId" element={<SubmissionFlowLayout />}>
+          <Route path="submitted" element={<SubmitStep />} />
+          <Route path="edit" element={<EditStep />} />
+          <Route path="pending" element={<PendingStep />} />
+          <Route path="evaluated" element={<EvaluatedStep />} />
+          <Route path="evaluated/details" element={<EvaluatedDetails />} />
+        </Route>
+
+        <Route path="/events" element={<EventsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+
+      </Route>
+
+      {/* Fallback */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
-};
-
-export default AppRoutes;
+}

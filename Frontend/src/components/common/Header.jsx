@@ -1,6 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from './Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import{
+  faPlus
+} from '@fortawesome/free-solid-svg-icons';
 
 const Header = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
@@ -17,9 +21,7 @@ const Header = ({ onToggleSidebar }) => {
       </button>
 
       <div className="flex items-center gap-4">
-        <Button onClick={() => navigate('/submissions/new')} size="sm">
-          ➕ New Submission
-        </Button>
+        
         
         <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
           <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

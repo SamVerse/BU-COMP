@@ -1,198 +1,255 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Card from '../../components/common/Card';
-import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
-import StatusBadge from '../../components/common/StatusBadge';
+// src/pages/participant/Submissions.jsx
+import React, { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Card from "../../components/common/Card";
+import Button from "../../components/common/Button";
+import Input from "../../components/common/Input";
+import StatusBadge from "../../components/common/StatusBadge";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faFolderOpen } from "@fortawesome/free-solid-svg-icons";
 
-const SubmissionsPage = () => {
+// sample data; replace with API
+const sampleData = [
+  {
+    id: "1",
+    title: "AI-Powered Study Assistant",
+    event: "TechFest 2025 Hackathon",
+    status: "submitted", // draft | submitted | pending | shortlisted | evaluated
+    submittedOn: "2025-11-05",
+    lastUpdated: "2025-11-08",
+    deadline: "2025-11-25",
+    secretCode: "EVT-XYZ-111"
+  },
+  {
+    id: "2",
+    title: "Smart Campus Navigation",
+    event: "Innovation Challenge 2025",
+    status: "evaluated",
+    submittedOn: "2025-10-01",
+    lastUpdated: "2025-10-03",
+    deadline: "2025-10-15",
+    score: 8.5,
+    secretCode: "EVT-ABC-222"
+  },
+  {
+    id: "3",
+    title: "EcoTrack Sensor",
+    event: "Green Tech Summit",
+    status: "pending",
+    submittedOn: "2025-11-08",
+    lastUpdated: "2025-11-10",
+    deadline: "2025-11-20",
+    secretCode: "EVT-ENV-333"
+  },
+  {
+    id: "4",
+    title: "AutoCrop Analyzer",
+    event: "AgriTech Titans",
+    status: "draft",
+    submittedOn: null,
+    lastUpdated: "2025-11-12",
+    deadline: "2025-12-01",
+    secretCode: "EVT-AGRI-999"
+  }
+];
+
+export default function SubmissionsPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const submissions = useMemo(() => sampleData, []);
 
-  // Mock submissions data
-  const submissions = [
-    {
-      id: 1,
-      title: 'AI-Powered Study Assistant',
-      event: 'TechFest 2025 Hackathon',
-      status: 'under-review',
-      submittedOn: '2025-11-05',
-      description: 'An intelligent chatbot that helps students with their coursework',
-      score: null,
-    },
-    {
-      id: 2,
-      title: 'Smart Campus Navigation',
-      event: 'Innovation Challenge 2024',
-      status: 'shortlisted',
-      submittedOn: '2024-09-15',
-      description: 'AR-based navigation system for university campus',
-      score: 8.5,
-    },
-    {
-      id: 3,
-      title: 'Code Review Assistant',
-      event: 'Code Sprint Fall 2024',
-      status: 'rejected',
-      submittedOn: '2024-10-20',
-      description: 'Automated code review tool using machine learning',
-      score: 6.2,
-    },
-    {
-      id: 4,
-      title: 'Sustainability Tracker',
-      event: 'Green Tech Hackathon',
-      status: 'draft',
-      submittedOn: null,
-      description: 'Track and reduce your carbon footprint',
-      score: null,
-    },
-  ];
+  const [filter, setFilter] = useState("all");
 
-  const filteredSubmissions = submissions.filter((sub) => {
-    const matchesSearch =
-      sub.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      sub.event.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTab = activeTab === 'all' || sub.status === activeTab;
-    return matchesSearch && matchesTab;
+  const filteredSubmissions = submissions.filter((s) => {
+    if (filter === "all") return true;
+    if (filter === "under-review") return s.status === "pending";
+    if (filter === "shortlisted") return s.status === "shortlisted";
+    if (filter === "drafts") return s.status === "draft";
+    if (filter === "evaluated") return s.status === "evaluated";
+    return true;
   });
 
-  const tabs = [
-    { id: 'all', label: 'All Submissions', count: submissions.length },
-    { id: 'under-review', label: 'Under Review', count: submissions.filter((s) => s.status === 'under-review').length },
-    { id: 'shortlisted', label: 'Shortlisted', count: submissions.filter((s) => s.status === 'shortlisted').length },
-    { id: 'draft', label: 'Drafts', count: submissions.filter((s) => s.status === 'draft').length },
+  const hasSubmissions = submissions && submissions.length > 0;
+  const hasFiltered = filteredSubmissions.length > 0;
+
+  const filters = [
+    { id: "all", label: "All Submissions" },
+    { id: "under-review", label: "Under Review" },
+    { id: "shortlisted", label: "Shortlisted" },
+    { id: "drafts", label: "Drafts" },
+    { id: "evaluated", label: "Evaluated" }
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 p-4">
+      {/* HEADER */}
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">My Submissions</h1>
-          <p className="text-gray-600 mt-1">Manage all your project submissions</p>
+          <p className="text-gray-600 mt-1">
+            Manage your project submissions and track evaluation progress
+          </p>
         </div>
-        <Button variant="primary" icon="➕" onClick={() => navigate('/submissions/new')}>
-          New Submission
-        </Button>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant="primary"
+            icon={<FontAwesomeIcon icon={faPlus} />}
+            onClick={() => navigate("/submissions/new")}
+          >
+            New Submission
+          </Button>
+        </div>
       </div>
 
+      {/* SEARCH + FILTERS */}
       <Card padding="default">
         <div className="space-y-4">
-          <Input
-            placeholder="Search by project title or event name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            icon={
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            }
-          />
+          <Input placeholder="Search by title or event..." onChange={() => {}} />
 
-          <div className="flex gap-2 border-b border-gray-200">
-            {tabs.map((tab) => (
+          {/* FILTERS */}
+          <div className="flex gap-4 overflow-x-auto border-b pb-2">
+            {filters.map((f) => (
               <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 font-medium text-sm transition-colors ${
-                  activeTab === tab.id ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600 hover:text-gray-900'
-                }`}
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition 
+                  ${
+                    filter === f.id
+                      ? "text-blue-600 border-b-2 border-blue-600"
+                      : "text-gray-600 hover:text-gray-900"
+                  }
+                `}
               >
-                {tab.label}
-                <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-gray-100">{tab.count}</span>
+                {f.label}
               </button>
             ))}
           </div>
         </div>
       </Card>
 
-      <div className="space-y-4">
-        {filteredSubmissions.length === 0 ? (
-          <Card padding="lg">
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">📭</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No submissions found</h3>
-              <p className="text-gray-600 mb-6">
-                {searchQuery ? 'Try adjusting your search' : 'Start by creating your first submission'}
-              </p>
-              {!searchQuery && (
-                <Button variant="primary" onClick={() => navigate('/submissions/new')}>
-                  Create Submission
-                </Button>
-              )}
-            </div>
-          </Card>
-        ) : (
-          filteredSubmissions.map((submission) => <SubmissionCard key={submission.id} submission={submission} />)
-        )}
-      </div>
-    </div>
-  );
-};
-
-const SubmissionCard = ({ submission }) => {
-  return (
-    <Card padding="default" hover>
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center text-2xl flex-shrink-0">
-              📁
+      {/* EMPTY STATE IF NO SUBMISSIONS */}
+      {!hasSubmissions && (
+        <Card padding="lg">
+          <div className="text-center py-12">
+            <div className="mx-auto w-28 h-28 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 text-4xl">
+              <FontAwesomeIcon icon={faFolderOpen} />
             </div>
 
-            <div className="flex-1">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{submission.title}</h3>
-                  <p className="text-sm text-gray-600 mt-1">{submission.event}</p>
-                </div>
-                <StatusBadge status={submission.status} />
-              </div>
+            <h3 className="text-2xl font-semibold text-gray-900 mt-6">
+              No submissions yet
+            </h3>
+            <p className="text-gray-600 mt-2">
+              You haven't added any project submissions. Add your first project.
+            </p>
 
-              <p className="text-sm text-gray-700 mt-3 line-clamp-2">{submission.description}</p>
-
-              <div className="flex items-center gap-6 mt-4 text-sm text-gray-500">
-                {submission.submittedOn && (
-                  <div className="flex items-center gap-1">
-                    <span>📅</span>
-                    <span>
-                      Submitted {new Date(submission.submittedOn).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                )}
-                {submission.score && (
-                  <div className="flex items-center gap-1">
-                    <span>⭐</span>
-                    <span>Score: {submission.score}/10</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex gap-3 mt-4">
-                <Button variant="primary" size="sm">
-                  View Details
-                </Button>
-                {submission.status === 'draft' ? (
-                  <Button variant="outline" size="sm">
-                    Continue Editing
-                  </Button>
-                ) : (
-                  <Button variant="ghost" size="sm">
-                    Download
-                  </Button>
-                )}
-              </div>
+            <div className="mt-6">
+              <Button
+                variant="primary"
+                icon={<FontAwesomeIcon icon={faPlus} />}
+                onClick={() => navigate("/submissions/new")}
+              >
+                Add your first project
+              </Button>
             </div>
           </div>
-        </div>
-      </div>
-    </Card>
-  );
-};
+        </Card>
+      )}
 
-export default SubmissionsPage;
+      {/* LIST */}
+      {hasSubmissions && (
+        <div className="space-y-4">
+          {!hasFiltered ? (
+            <Card padding="lg">
+              <p className="text-center text-gray-600 py-6">No submissions found in this category.</p>
+            </Card>
+          ) : (
+            filteredSubmissions.map((s) => (
+              <div
+                key={s.id}
+                className="p-4 border rounded-lg hover:shadow-sm transition cursor-pointer"
+                onClick={() => navigate(`/submissions/${s.id}/submitted`)}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    {/* Avatar */}
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-lg font-semibold">
+                        {s.title
+                          .split(" ")
+                          .map((t) => t[0])
+                          .slice(0, 2)
+                          .join("")}
+                      </div>
+
+                      <div className="min-w-0">
+                        <p className="text-lg font-semibold text-gray-900 truncate">
+                          {s.title}
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1 truncate">
+                          {s.event}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Meta Info */}
+                    <div className="flex items-center gap-6 mt-3 text-sm text-gray-500">
+                      <div>
+                        Submitted{" "}
+                        {s.submittedOn
+                          ? new Date(s.submittedOn).toLocaleDateString()
+                          : "—"}
+                      </div>
+                      <div>
+                        Last updated{" "}
+                        {s.lastUpdated
+                          ? new Date(s.lastUpdated).toLocaleDateString()
+                          : "—"}
+                      </div>
+                      {s.score && (
+                        <div>
+                          Score:{" "}
+                          <span className="font-medium text-gray-900">
+                            {s.score}/10
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Status + Actions */}
+                  <div className="flex flex-col items-end gap-3">
+                    <StatusBadge status={s.status} />
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/submissions/${s.id}/submitted`);
+                        }}
+                      >
+                        View
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/submissions/${s.id}/edit`);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

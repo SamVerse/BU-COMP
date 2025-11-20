@@ -2,6 +2,14 @@ import React, { useState } from 'react';
 import Card from '../../components/common/Card';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUser,
+  faLock,
+  faBell,
+  faShieldHalved
+} from "@fortawesome/free-solid-svg-icons";
+
 
 const SettingsPage = () => {
   const [activeSection, setActiveSection] = useState('profile');
@@ -73,11 +81,12 @@ const SettingsPage = () => {
   };
 
   const sections = [
-    { id: 'profile', label: 'Profile', icon: '👤' },
-    { id: 'account', label: 'Account & Security', icon: '🔒' },
-    { id: 'notifications', label: 'Notifications', icon: '🔔' },
-    { id: 'privacy', label: 'Privacy', icon: '🛡️' },
+    { id: 'profile', label: 'Profile', icon: <FontAwesomeIcon icon={faUser} /> },
+    { id: 'account', label: 'Account & Security', icon: <FontAwesomeIcon icon={faLock} /> },
+    { id: 'notifications', label: 'Notifications', icon: <FontAwesomeIcon icon={faBell} /> },
+    { id: 'privacy', label: 'Privacy', icon: <FontAwesomeIcon icon={faShieldHalved} /> },
   ];
+  
 
   return (
     <div className="space-y-6">

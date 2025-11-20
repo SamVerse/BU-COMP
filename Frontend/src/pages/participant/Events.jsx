@@ -3,6 +3,26 @@ import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faSearch,
+  faLaptopCode,
+  faTrophy,
+  faCode,
+  faFolderOpen,
+  faUsers,
+  faUserGroup,
+  faMoneyBillWave,
+  faCalendar,
+  faClock,
+  faPlay,
+  faHistory,
+  faUpload,
+  faUserPlus,
+  faChartBar,
+  faEye
+} from "@fortawesome/free-solid-svg-icons";
+
 const EventsPage = () => {
   const [activeTab, setActiveTab] = useState('ongoing');
   const [searchQuery, setSearchQuery] = useState('');
@@ -89,6 +109,18 @@ const EventsPage = () => {
     { id: 'past', label: 'Past Events', count: events.filter((e) => e.status === 'past').length },
   ];
 
+  const categoryIcons = {
+    Hackathon: faLaptopCode,
+    Competition: faTrophy,
+    Programming: faCode,
+  };
+
+  const statusIcons = {
+    ongoing: faPlay,
+    upcoming: faClock,
+    past: faHistory,
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -104,16 +136,7 @@ const EventsPage = () => {
             placeholder="Search events by name, organizer, or description..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            icon={
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            }
+            icon={<FontAwesomeIcon icon={faSearch} className="text-gray-500" />}
           />
 
           <div className="flex gap-2 border-b border-gray-200">
@@ -140,13 +163,15 @@ const EventsPage = () => {
         {filteredEvents.length === 0 ? (
           <Card padding="lg">
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">📅</div>
+              <FontAwesomeIcon icon={faCalendar} className="text-5xl text-gray-400 mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No events found</h3>
               <p className="text-gray-600">Try adjusting your search or check other tabs</p>
             </div>
           </Card>
         ) : (
-          filteredEvents.map((event) => <EventCard key={event.id} event={event} />)
+          filteredEvents.map((event) => (
+            <EventCard key={event.id} event={event} categoryIcons={categoryIcons} statusIcons={statusIcons} />
+          ))
         )}
       </div>
     </div>
@@ -154,17 +179,11 @@ const EventsPage = () => {
 };
 
 // Event Card Component
-const EventCard = ({ event }) => {
+const EventCard = ({ event, categoryIcons, statusIcons }) => {
   const statusColors = {
     ongoing: 'bg-green-100 text-green-800 border-green-200',
     upcoming: 'bg-blue-100 text-blue-800 border-blue-200',
     past: 'bg-gray-100 text-gray-800 border-gray-200',
-  };
-
-  const categoryIcons = {
-    Hackathon: '💻',
-    Competition: '🏆',
-    Programming: '⚡',
   };
 
   const getDaysRemaining = () => {
@@ -186,8 +205,8 @@ const EventCard = ({ event }) => {
         <div className="flex-1">
           <div className="flex items-start gap-4">
             {/* Icon */}
-            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-3xl flex-shrink-0">
-              {categoryIcons[event.category] || '📋'}
+            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-3xl flex-shrink-0">
+              <FontAwesomeIcon icon={categoryIcons[event.category] || faFolderOpen} />
             </div>
 
             {/* Content */}
@@ -217,20 +236,29 @@ const EventCard = ({ event }) => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
                   <p className="text-gray-500">Participants</p>
-                  <p className="font-medium text-gray-900 mt-1">👥 {event.participants}</p>
+                  <p className="font-medium text-gray-900 mt-1">
+                    <FontAwesomeIcon icon={faUsers} className="mr-1" /> {event.participants}
+                  </p>
                 </div>
+
                 <div>
                   <p className="text-gray-500">Team Size</p>
-                  <p className="font-medium text-gray-900 mt-1">👨‍👩‍👧‍👦 Max {event.maxTeamSize}</p>
+                  <p className="font-medium text-gray-900 mt-1">
+                    <FontAwesomeIcon icon={faUserGroup} className="mr-1" /> Max {event.maxTeamSize}
+                  </p>
                 </div>
+
                 <div>
                   <p className="text-gray-500">Prize Pool</p>
-                  <p className="font-medium text-gray-900 mt-1">💰 {event.prizes[0]}</p>
+                  <p className="font-medium text-gray-900 mt-1">
+                    <FontAwesomeIcon icon={faMoneyBillWave} className="mr-1" /> {event.prizes[0]}
+                  </p>
                 </div>
+
                 <div>
                   <p className="text-gray-500">Deadline</p>
                   <p className="font-medium text-gray-900 mt-1">
-                    📅{' '}
+                    <FontAwesomeIcon icon={faCalendar} className="mr-1" />
                     {new Date(event.submissionDeadline).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -243,20 +271,28 @@ const EventCard = ({ event }) => {
         </div>
 
         {/* Right Section - Actions */}
-        <div className="lg:ml-6 flex-shrink-0 space-y-3">
+        <div className="lg:ml-6 flex-shrink-0 space-y-3 text-center">
+
+          {/* Status */}
           <span
-            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${statusColors[event.status]}`}
+            className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border ${statusColors[event.status]}`}
           >
+            <FontAwesomeIcon icon={statusIcons[event.status]} />
             {event.status.charAt(0).toUpperCase() + event.status.slice(1)}
           </span>
 
           {event.status !== 'past' && (
-            <div className="text-sm font-medium text-gray-700">⏰ {getDaysRemaining()}</div>
+            <div className="text-sm font-medium text-gray-700 flex items-center justify-center gap-1">
+              <FontAwesomeIcon icon={faClock} />
+              {getDaysRemaining()}
+            </div>
           )}
 
+          {/* Actions */}
           <div className="flex flex-col gap-2">
             {event.status === 'ongoing' ? (
               <Button variant="primary" size="sm" fullWidth>
+                <FontAwesomeIcon icon={faUpload} className="mr-2" />
                 Submit Project
               </Button>
             ) : event.status === 'upcoming' ? (
@@ -266,15 +302,19 @@ const EventCard = ({ event }) => {
                 </Button>
               ) : (
                 <Button variant="primary" size="sm" fullWidth>
+                  <FontAwesomeIcon icon={faUserPlus} className="mr-2" />
                   Register Now
                 </Button>
               )
             ) : (
               <Button variant="outline" size="sm" fullWidth>
+                <FontAwesomeIcon icon={faChartBar} className="mr-2" />
                 View Results
               </Button>
             )}
+
             <Button variant="ghost" size="sm" fullWidth>
+              <FontAwesomeIcon icon={faEye} className="mr-2" />
               View Details
             </Button>
           </div>

@@ -1,19 +1,5 @@
-import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import DashboardLayout from './components/layout/DashboardLayout';
-import AppRoutes from './routes';
+import AppRoutes from "./routes/index";
 
-function App() {
-  return (
-    <BrowserRouter>
-      <AuthProvider>
-        <DashboardLayout>
-          <AppRoutes />
-        </DashboardLayout>
-      </AuthProvider>
-    </BrowserRouter>
-  );
+export default function App() {
+  return <AppRoutes />;
 }
-
-export default App;
